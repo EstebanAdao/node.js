@@ -6,12 +6,18 @@ var logger = require('morgan');
 var expressNunjucks = require('express-nunjucks');
 var bodyParser = require('body-parser')
 
-var indexRouter = require('./routes/musicas')
+//var indexRouter = require('./routes/musicas')
+var indexRouter = require('./routes/index')
 var methodOverride = require('method-override');
 
+var session = require('express-session')
 
-//var indexRouter = require('./routes/index');
-//var usersRouter = require('./routes/users');
+require('./models/musics')
+var mongoose = require('mongoose')
+mongoose.Promise = require('bluebird');
+mongoose.connect('mongodb://localhost/musics', {
+  useNewUrlParser: true
+});
 
 var app = express();
 
@@ -21,11 +27,17 @@ app.set('view engine', 'njk');
 
 var njk = expressNunjucks(app);
 
-app.use(bodyParser.urlencoded())
+app.use(session({
+  secret: 'teste sessoes',
+  resave: false,
+  saveUninitialized: false
+}))
+
+app.use(bodyParser.urlencoded({
+  extended: true
+}))
 app.use(methodOverride((req, res) => {
-  console.log('req', req.body)
   if (req.body && typeof req.body === 'object' && '_method' in req.body) {
-    console.log('Entrei')
     var method = req.body._method
     delete req.body._method
     return method
