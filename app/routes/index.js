@@ -1,20 +1,37 @@
 var express = require('express');
 var router = express.Router();
+var passport = require('passport');
+
+var isAuth = require('../middlewares/authorize.js').isAuth;
+var isNotAuth = require('../middlewares/authorize.js').isNotAuth;
 
 /* GET home page. */
-router.get('/', (req, res, next) => {
-  res.render('index', {
-    title: 'Express'
+router.get('/', isAuth, (req, res, next) => {
+  res.render('home', {
+    session: req.session,
+    usuario: req.user
   });
 });
 
-router.get('/tabuada/:valor', (req, res, next) => {
-  //res.render('index', { title: 'Express' });
-  var valor = req.params.valor;
-  var resultado = (valor % 2) == 0 ? valor : false;
-  res.render('tabuada', {
-    numero: resultado
-  })
+router.get('/login', isNotAuth, (req, res, next) => {
+  res.render('login')
+})
+
+router.post('/', passport.authenticate('local', {
+  successRedirect: '/home',
+  failureRedirect: '/error',
+}));
+
+router.get('/home', isAuth, (req, res, next) => {
+  res.render('home', {
+    session: req.session,
+    usuario: req.user
+  });
+});
+
+router.get('/logout', (req, res, next) => {
+  req.session.destroy();
+  res.redirect('/')
 });
 
 module.exports = router;

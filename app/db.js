@@ -5,7 +5,7 @@ var db = knex({
     host: '127.0.0.1',
     user: 'root',
     password: 'admin',
-    database: 'musics'
+    database: 'autenticacao'
   }
 });
 module.exports = db;
